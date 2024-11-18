@@ -93,4 +93,26 @@ class EitherTest {
             case Right<Integer, Integer> right -> assertEquals(42, right.value());
         }
     }
+    
+    @Test
+    void left_fold() {
+        final Either<Integer, String> either = Either.left(12);
+        final String res = either.fold(
+            i -> i.toString() + "L",
+            i -> i + "R"
+        );
+        
+        assertEquals("12L", res);
+    }
+    
+    @Test
+    void right_fold() {
+        final Either<Integer, String> either = Either.right("12");
+        final String res = either.fold(
+            i -> i.toString() + "L",
+            i -> i + "R"
+        );
+        
+        assertEquals("12R", res);
+    }
 }

@@ -24,4 +24,9 @@ public record Right<L, R>(R value) implements Either<L, R> {
     public <T> Either<L, T> flatMapRight(Function<R, Either<L, T>> f) {
         return f.apply(value);
     }
+
+    @Override
+    public <T> T fold(Function<L, T> left, Function<R, T> right) {
+        return right.apply(value);
+    }
 }

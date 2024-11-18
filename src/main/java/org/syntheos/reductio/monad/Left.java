@@ -4,16 +4,6 @@ import java.util.function.Function;
 
 public record Left<L, R>(L value) implements Either<L, R> {
     @Override
-    public L left() {
-        return value;
-    }
-
-    @Override
-    public R right() {
-        throw new IllegalStateException("Right value not present");
-    }
-
-    @Override
     public <T> Either<T, R> mapLeft(Function<L, T> f) {
         return new Left<>(f.apply(value));
     }

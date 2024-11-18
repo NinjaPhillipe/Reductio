@@ -3,16 +3,6 @@ package org.syntheos.reductio.monad;
 import java.util.function.Function;
 
 public record Right<L, R>(R value) implements Either<L, R> {
-    @Override
-    public L left() {
-        throw new IllegalStateException("Left value not present");
-    }
-
-    @Override
-    public R right() {
-        return value;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public <T> Either<T, R> mapLeft(Function<L, T> f) {

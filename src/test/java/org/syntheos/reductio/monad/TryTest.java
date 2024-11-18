@@ -16,14 +16,10 @@ class TryTest {
         var t = Try.of(() -> Integer.parseInt("a"))
                 .map(i -> i + 1);
         
-        // to show that we can switch on the sealed interface without default case
         switch (t) {
-            case Success<Integer> s -> System.out.println("Success: " + s.value());
-            case Failure<Integer> f -> System.out.println("Failure: " + f.e());
+            case Success<Integer> s -> throw new IllegalStateException("Success not expected");
+            case Failure<Integer> f -> assertInstanceOf(NumberFormatException.class, f.exc());
         }
-        
-        assertInstanceOf(Failure.class, t);
-        
     }
     
     @Test
@@ -31,7 +27,10 @@ class TryTest {
         var t = Try.of(() -> "a")
                 .mapC(Integer::parseInt);
         
-        assertInstanceOf(Failure.class, t);
+        switch (t) {
+            case Success<Integer> s -> throw new IllegalStateException("Success not expected");
+            case Failure<Integer> f -> assertInstanceOf(NumberFormatException.class, f.exc());
+        }
     }
     
     @Test
@@ -44,13 +43,15 @@ class TryTest {
     
     @Test
     void try_flatmapC() {
-        final CheckedFunction<Integer, Try<Integer>> f = i -> Try.of(() -> i + 1);
+        final CheckedFunction<Integer, Try<Integer>> fun = i -> Try.of(() -> i + 1);
         
         var t = Try.of(() -> 3)
-                .flatMapC(f);
+                .flatMapC(fun);
         
-        assertInstanceOf(Success.class, t);
-        assertEquals(4, t.toOption().orElseThrow(() -> new IllegalStateException("Option is empty")));
+        switch (t) {
+            case Success<Integer> s -> assertEquals(4, s.toOption().orElseThrow(() -> new IllegalStateException("Option is empty")));
+            case Failure<Integer> f -> throw new IllegalStateException("Failure not expected");
+        }
     }
     
     @Test
@@ -72,7 +73,11 @@ class TryTest {
         var t = Try.of(() -> START_VALUE)
                 .peek(c);
         
-        assertInstanceOf(Success.class, t);
+        switch (t) {
+            case Success<Integer> s -> assertEquals(START_VALUE, s.toOption().orElseThrow(() -> new IllegalStateException("Option is empty")));
+            case Failure<Integer> f -> throw new IllegalStateException("Failure not expected");
+        }
+        
         assertEquals(START_VALUE + 1, a.get());
     }
     
@@ -84,8 +89,10 @@ class TryTest {
         var t = Try.of(() -> START_VALUE)
                 .recover(e -> RECOVERY_VALUE);
         
-        assertInstanceOf(Success.class, t);
-        assertEquals(START_VALUE, t.toOption().orElseThrow(() -> new IllegalStateException("Option is empty")));
+        switch (t) {
+            case Success<Integer> s -> assertEquals(START_VALUE, s.toOption().orElseThrow(() -> new IllegalStateException("Option is empty")));
+            case Failure<Integer> f -> throw new IllegalStateException("Failure not expected");
+        }
     }
     
     @Test
@@ -94,8 +101,10 @@ class TryTest {
 
         var t = Try.of(() -> Integer.parseInt("a"))
                 .recover(e -> RECOVERY_VALUE);
-
-        assertInstanceOf(Success.class, t);
-        assertEquals(RECOVERY_VALUE, t.toOption().orElseThrow(() -> new IllegalStateException("Option is empty")));
+        
+        switch (t) {
+            case Success<Integer> s -> assertEquals(RECOVERY_VALUE, s.toOption().orElseThrow(() -> new IllegalStateException("Option is empty")));
+            case Failure<Integer> f -> throw new IllegalStateException("Failure not expected");
+        }
     }
 }

@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public record Failure<T>(Exception e) implements Try<T> {
+public record Failure<T>(Exception exc) implements Try<T> {
     @Override
     public boolean isSuccess() {
         return false;
@@ -58,7 +58,7 @@ public record Failure<T>(Exception e) implements Try<T> {
     @Override
     public Try<T> recover(Function<? super Exception, ? extends T> mapper) {
         try {
-            return new Success<>(mapper.apply(e));
+            return new Success<>(mapper.apply(exc));
         } catch (Exception ex) {
             return new Failure<>(ex);
         }

@@ -13,6 +13,10 @@ public record Left<L, R>(L value) implements Either<L, R> {
         throw new IllegalStateException("Right value not present");
     }
 
+    @Override
+    public <T> Either<T, R> mapLeft(Function<L, T> f) {
+        return new Left<>(f.apply(value));
+    }
     @SuppressWarnings("unchecked")
     @Override
     public <T> Either<L, T> mapRight(Function<R, T> f) {
@@ -20,7 +24,13 @@ public record Left<L, R>(L value) implements Either<L, R> {
     }
 
     @Override
-    public <T> Either<T, R> mapLeft(Function<L, T> f) {
-        return new Left<>(f.apply(value));
+    public <T> Either<T, R> flatMapLeft(Function<L, Either<T, R>> f) {
+        return f.apply(value);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> Either<L, T> flatMapRight(Function<R, Either<L, T>> f) {
+        return (Either<L, T>) this;
     }
 }

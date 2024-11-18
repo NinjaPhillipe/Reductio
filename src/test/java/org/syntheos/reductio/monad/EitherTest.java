@@ -49,4 +49,48 @@ class EitherTest {
             case Right<String, String> right -> assertEquals("42!", right.value());
         }
     }
+    
+    @Test
+    void left_flatMapLeft() {
+        final Either<Integer, String> either = Either.left(12);
+        final Either<String, String> eitherRes = either.flatMapLeft(s -> Either.left(s + "!"));
+        
+        switch (eitherRes) {
+            case Left<String, String> left -> assertEquals("12!", left.value());
+            case Right<String, String> right -> throw new IllegalStateException("Right value not expected");
+        }
+    }
+    
+    @Test
+    void left_flatMapRight() {
+        final Either<Integer, String> either = Either.left(12);
+        final Either<Integer, String> eitherRes = either.flatMapRight(s -> Either.right(s + "!"));
+
+        switch (eitherRes) {
+            case Left<Integer, String> left -> assertEquals(12, left.value());
+            case Right<Integer, String> right -> throw new IllegalStateException("Right value not expected");
+        }
+    }
+    
+    @Test
+    void right_flatMapLeft() {
+        final Either<Integer, String> either = Either.right("42");
+        final Either<String, String> eitherRes = either.flatMapLeft(s -> Either.left(s + "!"));
+        
+        switch (eitherRes) {
+            case Left<String, String> left -> throw new IllegalStateException("Left value not expected");
+            case Right<String, String> right -> assertEquals("42", right.value());
+        }
+    }
+    
+    @Test
+    void right_flatMapRight() {
+        final Either<Integer, String> either = Either.right("42");
+        final Either<Integer, Integer> eitherRes = either.flatMapRight(s -> Either.right(Integer.parseInt(s)));
+
+        switch (eitherRes) {
+            case Left<Integer, Integer> left -> throw new IllegalStateException("Left value not expected");
+            case Right<Integer, Integer> right -> assertEquals(42, right.value());
+        }
+    }
 }
